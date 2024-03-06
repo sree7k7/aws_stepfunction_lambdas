@@ -10,6 +10,16 @@
 
 To execute follow this [doc](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)
 
+After deploying go to -> state machine -> Start execution
+
+give event input as:
+
+```
+{
+  "accountNo": "123456789012"
+}
+```
+
 ## Design
 
 ![alt text](stepfunctions_graph.png)
