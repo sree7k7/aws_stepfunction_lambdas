@@ -1,9 +1,6 @@
 from aws_cdk import (
-    # Duration,
-    # core,
     Stack,
     Duration
-    # aws_sqs as sqs,
 )
 from constructs import Construct
 from aws_cdk import aws_lambda as _lambda
@@ -12,15 +9,24 @@ from aws_cdk import aws_stepfunctions_tasks as tasks
 
 
 class AwsStepfunctionLambdasStack(Stack):
+    """
+    A CDK stack that creates a Step Function with Lambda functions.
+
+    This stack creates a Step Function state machine and adds Lambda functions with choice to the state machine.
+    The state machine includes two Lambda functions: HelloWorld and CheckAccountNumber.
+    The HelloWorld Lambda function is invoked if the account number validation is successful.
+    The CheckAccountNumber Lambda function is invoked to validate the account number.
+    The state machine definition includes retries and choice conditions based on the status code returned by the CheckAccountNumber Lambda function.
+    The state machine has a timeout of 5 minutes.
+    """
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # create a step function
-        # state machine definition
-        # add below lambda functions with choice to the state machine
+        # Create the Step Function state machine
+        # and add the lambda functions with choice to the state machine
 
-    # hello world lambda
+        # Define the HelloWorld Lambda function
         hello_world_lambda = _lambda.Function(
             self,
             "HelloWorldHandler",
@@ -29,8 +35,8 @@ class AwsStepfunctionLambdasStack(Stack):
             code=_lambda.Code.from_asset("lambda"),
             handler="helloworld.lambda_handler"
         )
-        # Define the state machine
-        # create a lambda function
+
+        # Define the CheckAccountNumber Lambda function
         check_account_number_lambda = _lambda.Function(
             self,
             "HelloHandler",
@@ -40,6 +46,7 @@ class AwsStepfunctionLambdasStack(Stack):
             handler="lambda.lambda_handler"
         )
 
+        # Define the state machine definition
         definition = tasks.LambdaInvoke(self, 
             "Invoke Lambda - Validate account number",
             lambda_function=check_account_number_lambda,
@@ -59,10 +66,10 @@ class AwsStepfunctionLambdasStack(Stack):
             )
         )
 
+        # Create the Step Function state machine
         sfn.StateMachine(self, "StateMachine",
             definition=definition,
             timeout=Duration.minutes(5),
         )
-
 
 
