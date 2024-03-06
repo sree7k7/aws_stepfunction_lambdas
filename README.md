@@ -4,7 +4,7 @@
 - The state machine includes two Lambda functions: HelloWorld and CheckAccountNumber.
 - The HelloWorld Lambda function is invoked if the account number validation is successful.
 - The CheckAccountNumber Lambda function is invoked to validate the account number.
-- The state machine definition includes retries and choice conditions based on the status code returned by the CheckAccountNumber Lambda function. The state machine has a timeout of 5 minutes.
+- The state machine definition includes retries and choice conditions based on the status code returned by the CheckAccountNumber Lambda function. The state machine has a timeout of 5 minutes :alarm_clock:.
 
 ## Execution in cdk
 
@@ -13,3 +13,6 @@ To execute follow this [doc](https://docs.aws.amazon.com/cdk/v2/guide/getting_st
 ## Design
 
 ![alt text](stepfunctions_graph.png)
+
+
+:muscle:
