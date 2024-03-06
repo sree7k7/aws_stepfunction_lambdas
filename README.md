@@ -8,7 +8,7 @@
     The state machine has a timeout of 5 minutes.
 
 
-## Execution
+## Execution in cdk
 
 To execute follow this [doc](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)
     
