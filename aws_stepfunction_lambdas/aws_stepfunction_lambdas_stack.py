@@ -1,11 +1,17 @@
 from aws_cdk import (
     Stack,
-    Duration
+    Duration,
+    RemovalPolicy,
+    aws_logs as logs,
 )
 from constructs import Construct
 from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_stepfunctions as sfn
 from aws_cdk import aws_stepfunctions_tasks as tasks
+from aws_cdk import aws_cloudtrail as aws_cloudtrail
+from aws_cdk import aws_events as events
+from aws_cdk import aws_s3 as aws_s3
+
 
 
 class AwsStepfunctionLambdasStack(Stack):
@@ -73,3 +79,59 @@ class AwsStepfunctionLambdasStack(Stack):
         )
 
 
+        # # create a s3 bucket
+        s3_bucket = aws_s3.Bucket(self, "S3Bucket",
+            bucket_name="sran-sfn-tutorial",
+            removal_policy=RemovalPolicy.DESTROY,
+            event_bridge_enabled=True,
+            auto_delete_objects=True,
+        )
+        # # create cloudtrail trail log group
+
+        log_group = logs.LogGroup(
+            self,
+            "loggroup",
+            log_group_name="loggroup-s3trail",
+            removal_policy=RemovalPolicy.DESTROY,
+            retention=logs.RetentionDays.ONE_DAY,
+        )
+        # # create a cloudTrail event
+        cloudtrail_trail = aws_cloudtrail.Trail(
+            self,
+            "cloudtrailtrailforbucketcreation",
+            bucket=s3_bucket,
+            is_multi_region_trail=True,
+            include_global_service_events=True,
+            send_to_cloud_watch_logs=True,
+            enable_file_validation=True,
+            trail_name="CustomCloudTrail",
+            cloud_watch_logs_retention=logs.RetentionDays.ONE_DAY,
+            cloud_watch_log_group=log_group,
+            # management_events=[aws_cloudtrail.ReadWriteType.WRITE_ONLY],
+        )
+
+        # Adds an event selector to the bucket foo
+        cloudtrail_trail.add_s3_event_selector(
+            include_management_events=True,
+            s3_selector=[aws_cloudtrail.S3EventSelector(bucket=s3_bucket, object_prefix="")],
+            exclude_management_event_sources=[
+                aws_cloudtrail.ManagementEventSources.KMS,
+                aws_cloudtrail.ManagementEventSources.RDS_DATA_API,
+                ],
+            read_write_type=aws_cloudtrail.ReadWriteType.ALL,
+        )
+
+        # create a event to trigger the state machine when a file is uploaded to s3
+        event_rule = events.Rule(self, "EventsRule",
+            event_pattern=events.EventPattern(
+                source=["aws.s3"],
+                detail_type=["AWS API Call via CloudTrail"],
+                detail={
+                    "eventSource": ["s3.amazonaws.com"],
+                    "eventName": ["PutObject"],
+                    "requestParameters": {
+                        "bucketName": [s3_bucket.bucket_name]
+                    }
+                }
+            )
+        )

@@ -1,0 +1,78 @@
+---
+Metadata:
+  TemplateId: "arn:aws:cloudformation:eu-central-1:619831221558:generatedTemplate/bb3fbc50-8ca3-4da6-8a5f-5eaad5aa551e"
+Resources:
+  IAMManagedPolicy00policyserviceroleAmazonEventBridgeInvokeStepFunctions55938312500wTCGB:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::ManagedPolicy"
+    DeletionPolicy: "Retain"
+    Properties:
+      ManagedPolicyName: "Amazon_EventBridge_Invoke_Step_Functions_559383125"
+      Path: "/service-role/"
+      Description: ""
+      Groups: []
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Resource:
+          - "arn:aws:states:eu-central-1:619831221558:stateMachine:StateMachine2E01A3A5-fu8yG6kEbNY8"
+          Action:
+          - "states:StartExecution"
+          Effect: "Allow"
+      Roles:
+      - "Amazon_EventBridge_Invoke_Step_Functions_559383125"
+      Users: []
+  IAMRole00AmazonEventBridgeInvokeStepFunctions55938312500LlwSX:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::Role"
+    DeletionPolicy: "Retain"
+    Properties:
+      Path: "/service-role/"
+      ManagedPolicyArns:
+      - Ref: "IAMManagedPolicy00policyserviceroleAmazonEventBridgeInvokeStepFunctions55938312500wTCGB"
+      MaxSessionDuration: 3600
+      RoleName: "Amazon_EventBridge_Invoke_Step_Functions_559383125"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Action: "sts:AssumeRole"
+          Effect: "Allow"
+          Principal:
+            Service: "events.amazonaws.com"
+  EventsRule00ruletriggerSateMachine00kEDy9:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Events::Rule"
+    DeletionPolicy: "Retain"
+    Properties:
+      EventBusName:
+        Ref: "EventsEventBus00default00U5kFH"
+      EventPattern:
+        detail-type:
+        - "AWS API Call via CloudTrail"
+        source:
+        - "aws.s3"
+        detail:
+          eventSource:
+          - "s3.amazonaws.com"
+          requestParameters:
+            bucketName:
+            - "sran11-sfn-tutorial"
+          eventName:
+          - "PutObject"
+      Targets:
+      - Arn: "arn:aws:states:eu-central-1:619831221558:stateMachine:StateMachine2E01A3A5-fu8yG6kEbNY8"
+        RoleArn:
+          Fn::GetAtt:
+          - "IAMRole00AmazonEventBridgeInvokeStepFunctions55938312500LlwSX"
+          - "Arn"
+        Id: "Id94f06347-4d58-44f9-be1f-f0584b846b4c"
+      Id: "triggerSateMachine"
+      State: "ENABLED"
+      Name: "triggerSateMachine"
+  EventsEventBus00default00U5kFH:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Events::EventBus"
+    DeletionPolicy: "Retain"
+    Properties:
+      Tags: []
+      Name: "default"
