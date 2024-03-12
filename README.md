@@ -6,6 +6,10 @@
 - The CheckAccountNumber Lambda function is invoked to validate the account number.
 - The state machine definition includes retries and choice conditions based on the status code returned by the CheckAccountNumber Lambda function. The state machine has a timeout of 5 minutes :alarm_clock:.
 
+## Design
+
+![alt text](<pics/Untitled picture.png>)
+
 ## Execution in cdk
 
 To execute follow this [doc](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)
